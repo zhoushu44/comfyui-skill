@@ -10,6 +10,9 @@ def upload_and_run(host, port, user, password, local_path, remote_path, run_cmd=
     try:
         client.connect(host, port=int(port), username=user, password=password, timeout=15)
         sftp = client.open_sftp()
+        remote_dir = os.path.dirname(remote_path)
+        if remote_dir:
+            client.exec_command(f"mkdir -p '{remote_dir}'")
         sftp.put(local_path, remote_path)
         sftp.close()
         print(f"Uploaded: {local_path} -> {remote_path}")

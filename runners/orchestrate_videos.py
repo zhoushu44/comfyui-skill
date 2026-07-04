@@ -14,15 +14,24 @@ import urllib.error
 import uuid
 import os
 
-COMFYUI_URL = "http://127.0.0.1:8188"
+COMFYUI_URL = os.environ.get("COMFYUI_URL", "http://127.0.0.1:8188").rstrip("/")
 CLIENT_ID = str(uuid.uuid4())
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WORKFLOWS_DIR = os.path.join(PROJECT_ROOT, "workflows")
+
+
+def workflow_path(filename):
+    local_path = os.path.join(WORKFLOWS_DIR, filename)
+    return local_path if os.path.exists(local_path) else f"/tmp/{filename}"
+
 
 # 工作流文件列表（按顺序执行）
 WORKFLOWS = [
-    ("Wan 2.2 5s", "/tmp/wan22_i2v_beauty_dancing_5s.json"),
-    ("Wan 2.2 10s", "/tmp/wan22_i2v_beauty_dancing_10s.json"),
-    ("LTX-2.3 5s", "/tmp/ltx23_i2v_beauty_dancing_5s.json"),
-    ("LTX-2.3 10s", "/tmp/ltx23_i2v_beauty_dancing_10s.json"),
+    ("Wan 2.2 5s", workflow_path("wan22_i2v_beauty_dancing_5s.json")),
+    ("Wan 2.2 10s", workflow_path("wan22_i2v_beauty_dancing_10s.json")),
+    ("LTX-2.3 5s", workflow_path("ltx23_i2v_beauty_dancing_5s.json")),
+    ("LTX-2.3 10s", workflow_path("ltx23_i2v_beauty_dancing_10s.json")),
 ]
 
 # 结果记录文件

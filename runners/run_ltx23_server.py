@@ -5,6 +5,7 @@ LTX-2.3 图生视频运行器（服务端）
 提交工作流到 ComfyUI API，等待完成，报告输出文件
 """
 import json
+import os
 import sys
 import time
 import urllib.request
@@ -12,7 +13,7 @@ import urllib.parse
 import urllib.error
 import uuid
 
-COMFYUI_URL = "http://127.0.0.1:8188"
+COMFYUI_URL = os.environ.get("COMFYUI_URL", "http://127.0.0.1:8188").rstrip("/")
 CLIENT_ID = str(uuid.uuid4())
 
 
@@ -120,7 +121,12 @@ def run_workflow(workflow_path, poll_interval=15, max_wait=3600):
 
 
 def main():
-    workflow_path = sys.argv[1] if len(sys.argv) > 1 else "/tmp/ltx23_i2v_beauty_dancing_5s.json"
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    default_workflow = os.path.join(project_root, "workflows", "ltx23_i2v_beauty_dancing_5s.json")
+    if not os.path.exists(default_workflow):
+        default_workflow = "/tmp/ltx23_i2v_beauty_dancing_5s.json"
+
+    workflow_path = sys.argv[1] if len(sys.argv) > 1 else default_workflow
     poll_interval = int(sys.argv[2]) if len(sys.argv) > 2 else 15
     max_wait = int(sys.argv[3]) if len(sys.argv) > 3 else 1800
 

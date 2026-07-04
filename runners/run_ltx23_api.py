@@ -9,11 +9,12 @@ import os
 import sys
 import time
 import urllib.request
+import urllib.parse
 import urllib.error
 import uuid
 
 
-COMFYUI_URL = "http://127.0.0.1:8188"
+COMFYUI_URL = os.environ.get("COMFYUI_URL", "http://127.0.0.1:8188").rstrip("/")
 CLIENT_ID = str(uuid.uuid4())
 
 
@@ -161,24 +162,25 @@ def run_workflow(workflow_path, local_dir=".", poll_interval=10, max_wait=3600):
 
 
 def main():
-    import urllib.parse  # noqa: F401 (needed for download_file)
-
-    local_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    local_dir = os.getcwd()
+    assets_dir = os.path.join(project_root, "assets")
+    workflows_dir = os.path.join(project_root, "workflows")
 
     # 确保参考图已上传
-    image_path = os.path.join(local_dir, "beauty_ref.png")
+    image_path = os.path.join(assets_dir, "beauty_ref.png")
     if os.path.exists(image_path):
         upload_image(image_path, "beauty_ref.png")
 
     # 运行 5s 版本
-    wf_5s = os.path.join(local_dir, "ltx23_i2v_beauty_dancing_5s.json")
+    wf_5s = os.path.join(workflows_dir, "ltx23_i2v_beauty_dancing_5s.json")
     if os.path.exists(wf_5s):
         success = run_workflow(wf_5s, local_dir, poll_interval=15, max_wait=1800)
         if not success:
             print("5s 版本生成失败")
 
     # 运行 10s 版本
-    wf_10s = os.path.join(local_dir, "ltx23_i2v_beauty_dancing_10s.json")
+    wf_10s = os.path.join(workflows_dir, "ltx23_i2v_beauty_dancing_10s.json")
     if os.path.exists(wf_10s):
         success = run_workflow(wf_10s, local_dir, poll_interval=15, max_wait=3600)
         if not success:
